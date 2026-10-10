@@ -8,10 +8,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/ZhengHeOwo/agent_noah/agent/internal/runtime"
+	
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/config"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/model/openai"
+	"github.com/ZhengHeOwo/agent_noah/agent/internal/runtime"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/terminal"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/tool"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/websearch"
@@ -108,7 +108,7 @@ func run() error {
 		return fmt.Errorf("创建Agent运行器失败: %w", err)
 	}
 
-console.Write([]byte(fmt.Sprint("Agent Noah 已启动, 输入 exit 退出\n")))
+	console.Write([]byte(fmt.Sprint("Agent Noah 已启动, 输入 exit 退出\n")))
 
 	for {
 		input, err := console.ReadLine(": ")
