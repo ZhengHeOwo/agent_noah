@@ -7,7 +7,7 @@ go build -o ~/agent-bin/agent-noah.new ./agent/cmd &&\
 mv ~/agent-bin/agent-noah.new ~/agent-bin/agent-noah &&\
 ~/agent-bin/agent-noah
 
-比手写方便\
+比手写方便
 
 ## 运行前准备：
 
@@ -37,7 +37,7 @@ Don't silently consume! if you're a big gay
 近期做长任务需要的各组件,同时随便优化现有的东西\
 -记忆加载写完了, 配置异常触发的切库恢复逻辑睡醒再写\
 -当前history_context是直接扔,后续会用作事件分析(记忆模块)\
--建议退出走exit, 而不是直接ctrl+c, 可能没问题, 可能有问题, 不确定漏洞是否被修复, 太困了, 明天写代码时随便排查\
+-建议退出走exit, 而不是直接ctrl+c, 可能没问题, 可能有问题, 不确定漏洞是否被修复, 太困了, 明天写代码时随便排查
 
 第一版确认完成之前不写完整的README
 
