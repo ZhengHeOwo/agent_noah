@@ -8,10 +8,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	
+
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/config"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/model/openai"
+	"github.com/ZhengHeOwo/agent_noah/agent/internal/repository/sqlite"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/runtime"
+	"github.com/ZhengHeOwo/agent_noah/agent/internal/runtimeControl"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/terminal"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/tool"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/websearch"
@@ -25,6 +27,17 @@ func main() {
 }
 
 func run() error {
+	sqliteDB, err := sqlite.NewDB("./agent/local/data/sqlite.db")
+	if err != nil {
+		return err
+	}
+
+	// 暂传nil, 切库逻辑完成恢复实际值.
+	sqlite, err := sqlite.NewSqlite(sqliteDB, nil)
+	if err != nil {
+		return err
+	}
+
 	console, err := terminal.NewConsole(os.Stdin, os.Stdout)
 	if err != nil {
 		return fmt.Errorf("创建终端交互对象失败: %w", err)
@@ -47,10 +60,6 @@ func run() error {
 	client, err := openai.NewClient(httpClient, cfg.Model.Endpoint, cfg.Model.APIKey)
 	if err != nil {
 		return fmt.Errorf("客户端配置失败: %w", err)
-	}
-
-	if err := os.MkdirAll(workspace.DefaultDir, 0o700); err != nil {
-		return fmt.Errorf("create workspace directory %q: %w", workspace.DefaultDir, err)
 	}
 
 	projectWorkspace, err := workspace.OpenWorkspace(workspace.DefaultDir)
@@ -86,20 +95,30 @@ func run() error {
 		return fmt.Errorf("create web_search tool: %w", err)
 	}
 
+	updateRuntimeConfigTool, err := runtimeControl.NewUpdateRuntimeConfigTool(sqlite)
+	if err != nil {
+		return fmt.Errorf("create update_runtime_config tool: %w", err)
+	}
+
+	deleteActiveContextBySerialAndIDTool, err := runtimeControl.NewDeleteActiveContextBySerialAndIDTool(sqlite)
+
 	toolsRegistry, err := tool.NewToolRegistry(
 		readTextFileTool,
 		listTextFilesTool,
 		writeTextFileTool,
 		searchTextTool,
 		webSearchTool,
+		updateRuntimeConfigTool,
+		deleteActiveContextBySerialAndIDTool,
 	)
 
 	if err != nil {
 		return fmt.Errorf("工具注册表创建失败: %w", err)
 	}
 
-	runtime, err := agent.NewRuntime(
+	runtime, err := runtime.NewRuntime(
 		client,
+		sqlite,
 		cfg.Model.Name,
 		cfg.Agent.SystemPrompt,
 		toolsRegistry,
@@ -110,7 +129,7 @@ func run() error {
 
 	console.Write([]byte(fmt.Sprint("Agent Noah 已启动, 输入 exit 退出\n")))
 
-	for {
+	for i := 1; ; i++ {
 		input, err := console.ReadLine(": ")
 		if err != nil {
 			if errors.Is(err, io.EOF) {

@@ -9,7 +9,7 @@ import (
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/tool"
 )
 
-// WriteTextFileTool 经狰和确认后，在受控工作区中创建或覆盖文本文件。
+// WriteTextFileTool 经确认后，在受控工作区中创建或覆盖文本文件。
 type WriteTextFileTool struct {
 	workspace *Workspace
 	confirmer tool.Confirmer

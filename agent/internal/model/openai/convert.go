@@ -123,10 +123,13 @@ func toChatCompletionRequest(request model.Request) (chatCompletionRequest, erro
 }
 
 func toChatMessage(modelMessage model.Message) (chatMessage, error) {
-	var content *string
-	if modelMessage.Content != "" || len(modelMessage.ToolCalls) == 0 {
-		content = &modelMessage.Content
-	}
+	prefix := fmt.Sprintf("Prefix: | serial %d | id %d | OccurrenceTime %s | MaxModelSteps %d | ResidueSteps %d |\n",
+		modelMessage.Prefix.Serial,
+		modelMessage.Prefix.Id,
+		modelMessage.Prefix.OccurrenceTime,
+		modelMessage.Prefix.MaxModelSteps,
+		modelMessage.Prefix.MaxModelSteps-modelMessage.Prefix.NowSteps,
+	)
 
 	var role string
 	switch modelMessage.Role {
@@ -134,13 +137,24 @@ func toChatMessage(modelMessage model.Message) (chatMessage, error) {
 		role = "system"
 	case model.RoleUser:
 		role = "user"
+		if ok := strings.HasPrefix(strings.TrimSpace(modelMessage.Content), "Prefix:"); !ok {
+			modelMessage.Content = prefix + modelMessage.Content
+		}
 	case model.RoleAssistant:
 		role = "assistant"
+		if ok := strings.HasPrefix(strings.TrimSpace(modelMessage.Content), "Prefix:"); !ok {
+			modelMessage.Content = prefix + modelMessage.Content
+		}
 	case model.RoleTool:
 		role = "tool"
+		if ok := strings.HasPrefix(strings.TrimSpace(modelMessage.Content), "Prefix:"); !ok {
+			modelMessage.Content = prefix + modelMessage.Content
+		}
 	default:
 		return chatMessage{}, fmt.Errorf("Role类型不符合预设: %q", modelMessage.Role)
 	}
+
+	content := &modelMessage.Content
 
 	chatToolCalls := make([]chatToolCall, 0, len(modelMessage.ToolCalls))
 	for _, toolCall := range modelMessage.ToolCalls {

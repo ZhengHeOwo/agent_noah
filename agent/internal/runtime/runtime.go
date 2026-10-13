@@ -1,27 +1,29 @@
-package agent
+package runtime
 
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/model"
+	"github.com/ZhengHeOwo/agent_noah/agent/internal/repository"
 	"github.com/ZhengHeOwo/agent_noah/agent/internal/tool"
 )
 
-const maxModelSteps = 30
-
 // Runtime 管理对话历史和单轮内的多步工具调用。
 type Runtime struct {
-	llm       model.Model
-	modelName string
-	Messages  []model.Message
-	tools     *tool.ToolRegistry
+	llm            model.Model
+	contextControl repository.ContextControl
+	runtimeConfig  *repository.RuntimeConfig
+	modelName      string
+	systemPrompt   string
+	tools          *tool.ToolRegistry
 }
 
 // NewRuntime 创建Agent运行时。
-func NewRuntime(llm model.Model, modelName string, systemPrompt string, tools *tool.ToolRegistry) (*Runtime, error) {
+func NewRuntime(llm model.Model, contextControl repository.ContextControl, modelName string, systemPrompt string, tools *tool.ToolRegistry) (*Runtime, error) {
 	if llm == nil {
 		return nil, fmt.Errorf("Model must not be empty")
 	}
@@ -38,41 +40,53 @@ func NewRuntime(llm model.Model, modelName string, systemPrompt string, tools *t
 		return nil, fmt.Errorf("tool registry must not be empty")
 	}
 
+	runtimeConfig, err := contextControl.GetRuntimeConfig(1)
+	if err != nil {
+		return nil, err
+	}
+
 	runtime := &Runtime{
-		llm:       llm,
-		modelName: strings.TrimSpace(modelName),
-		Messages: []model.Message{
-			model.Message{
-				Role:    model.RoleSystem,
-				Content: strings.TrimSpace(systemPrompt),
-			},
-		},
-		tools: tools,
+		llm:            llm,
+		contextControl: contextControl,
+		runtimeConfig:  runtimeConfig,
+		modelName:      strings.TrimSpace(modelName),
+		systemPrompt:   systemPrompt,
+		tools:          tools,
 	}
 
 	return runtime, nil
 }
 
 // RunTurn 执行一轮运行器。
-//
-// 只有取得最终模型回答后，本轮候选消息才会提交到正式历史。
 func (r *Runtime) RunTurn(ctx context.Context, input string) (string, error) {
 	input = strings.TrimSpace(input)
 	if input == "" {
 		return "", fmt.Errorf("input 不能为空")
 	}
 
-	workingMessages := make([]model.Message, 0, len(r.Messages)+1)
-	workingMessages = append(workingMessages, r.Messages...)
-	workingMessages = append(workingMessages, model.Message{
+	if err := r.contextControl.InsertMessage(&model.Message{
 		Role:    model.RoleUser,
 		Content: input,
-	})
+	}, r.runtimeConfig.NowSteps); err != nil {
+		return "", err
+	}
 
-	for step := 0; step < maxModelSteps; step++ {
+	for step := 1; step <= repository.MaxModelSteps; step++ {
+		contextRecord := &repository.ContextRecord{}
+
+		if r.runtimeConfig.Status == "inactive" {
+			if err := r.contextControl.LoadRecentContext(contextRecord, r.systemPrompt); err != nil {
+				return "", err
+			}
+		} else {
+			if err := r.contextControl.GetActiveContext(contextRecord, r.systemPrompt); err != nil {
+				return "", err
+			}
+		}
+
 		response, err := r.llm.Complete(ctx, model.Request{
 			Model:    r.modelName,
-			Messages: workingMessages,
+			Messages: contextRecord.Messages,
 			Tools:    r.tools.Definitions(),
 		})
 		if err != nil {
@@ -89,14 +103,25 @@ func (r *Runtime) RunTurn(ctx context.Context, input string) (string, error) {
 				return "", fmt.Errorf("%w: finish_reason=%q", ErrEmptyContent, response.FinishReason)
 			}
 
-			workingMessages = append(workingMessages, message)
-			r.Messages = workingMessages
+			if err := r.contextControl.InsertMessage(&message, r.runtimeConfig.NowSteps); err != nil {
+				return "", err
+			}
+
+			if err := r.contextControl.StatusTransition(); err != nil {
+				return "", err
+			}
+
+			r.contextControl.AddSerial()
 			return message.Content, nil
 		}
 
-		workingMessages = append(workingMessages, message)
+		if err := r.contextControl.InsertMessage(&message, r.runtimeConfig.NowSteps); err != nil {
+			return "", err
+		}
 
 		for _, call := range message.ToolCalls {
+			log.Printf("调用工具 %s", call.Name)
+
 			if strings.TrimSpace(call.Name) == "" {
 				return "", fmt.Errorf("%w: 工具名为空", ErrInvalidToolCall)
 			}
@@ -110,12 +135,20 @@ func (r *Runtime) RunTurn(ctx context.Context, input string) (string, error) {
 
 			result := r.executeToolCall(toolCtx, call)
 
-			workingMessages = append(workingMessages, model.Message{
+			log.Printf("工具 %s 调用结束", call.Name)
+
+			toolResultMessage := &model.Message{
 				Role:       model.RoleTool,
 				Content:    result,
 				ToolCallID: call.ID,
-			})
+			}
+
+			if err := r.contextControl.InsertMessage(toolResultMessage, r.runtimeConfig.NowSteps); err != nil {
+				return "", err
+			}
 		}
+
+		r.contextControl.AddModelSteps(r.runtimeConfig)
 	}
 
 	return "", ErrMaxStepsExceeded

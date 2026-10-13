@@ -25,18 +25,28 @@ type ToolDefinition struct {
 // ToolCall 描述模型发起的一次工具调用。
 type ToolCall struct {
 	// ID 必须原样写入对应工具结果消息的ToolCallID。
-	ID        string
-	Name      string
-	Arguments json.RawMessage
+	ID        string          `json:"id"`
+	Name      string          `json:"name"`
+	Arguments json.RawMessage `json:"argumnets"`
+}
+
+// Prefix 消息的固定前缀.
+type Prefix struct {
+	Serial         int64  `json:"serial"`
+	Id             int64  `json:"id"`
+	OccurrenceTime string `json:"occurrence_time"`
+	MaxModelSteps  int64  `json:"maxModelSteps"`
+	NowSteps       int64  `json:"nowSteps"`
 }
 
 // Message 表示与模型供应商无关的对话消息。
 type Message struct {
-	Role             Role
-	Content          string
-	ReasoningContent string
-	ToolCalls        []ToolCall
-	ToolCallID       string
+	Role             Role       `json:"role"`
+	Content          string     `json:"content"`
+	ReasoningContent string     `json:"reasoning_content"`
+	ToolCalls        []ToolCall `json:"tool_calls"`
+	ToolCallID       string     `json:"tool_call_id"`
+	Prefix           Prefix     `json:"prefix"`
 }
 
 // Request 表示一次模型请求。

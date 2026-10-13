@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-const reasoningEffort = "max"
+const reasoningEffort = "high"
 
 type chatCompletionRequest struct { //外部请求体
 	Model           string               `json:"model"`
