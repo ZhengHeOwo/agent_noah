@@ -19,8 +19,10 @@ mv ~/agent-bin/agent-noah.new ~/agent-bin/agent-noah &&\
 
 ## 须知:
 
-如果你在本机跑需要注意 --当前各工具绑定"当前所在目录", 逻辑位于: agent/internal/workspace/workspace.go, 详情:"const DefaultDir = `.`"\
-正常来说没什么问题, 运行go run时cd到 '你的盘:\agent_noah>' 就行\
+如果你在本机跑需要注意 --当前各工具绑定"当前所在目录", 逻辑位于: agent/internal/workspace/workspace.go, 详情:"const DefaultDir = `.`"
+
+正常来说没什么问题, 运行go run时cd到 '你的盘:\agent_noah>' 就行
+
 程序的brave(网络搜索)是外国的, 建议使用时挂着VPN, 等我把这个api的额度用完再接入国内搜索源
 
 ## 重要须知:
