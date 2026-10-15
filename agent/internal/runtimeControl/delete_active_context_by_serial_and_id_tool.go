@@ -27,14 +27,14 @@ type deleteActiveContextBySerialAndIDArguments struct {
 
 var deleteActiveContextBySerialAndIDParameters = json.RawMessage(`{
   "type": "object",
- "properties": {
+  "properties": {
     "serial": {
       "type": "integer",
-      "description": "删除目标的serial, 通常显示在content开头"
+      "description": "删除目标所属对话的serial, 取自该message内容开头的前缀行(形如 Prefix: | serial 3 | id 47 | ...)。同一次对话内产生的所有message共用同一个serial"
     },
 	 "id": {
       "type": "integer",
-      "description": "删除目标的id, 通常显示在content开头"
+      "description": "删除目标message的id, 取自该message内容开头的前缀行。id在活跃上下文内唯一, 不存在重复的(serial, id)组合"
     }
   },
   "required": ["serial", "id"],
@@ -44,10 +44,9 @@ var deleteActiveContextBySerialAndIDParameters = json.RawMessage(`{
 func (d *DeleteActiveContextBySerialAndIDTool) Definition() model.ToolDefinition {
 	return model.ToolDefinition{
 		Name: "delete_active_context_by_serial_and_id",
-		Description: "根据提供的serial和id删除当前活跃上下文的一个指定message, 删除会在本轮Tool全部返回后直接生效, " +
-			"不存在重合的(serial, id)组合, " +
-			"序列-serial是一次对话的计数, 通常等于对方的说话次数, 一次对话内产生的所有message的serial相同, " +
-			"身份-ID是一个message的独有标识,非程序异常不存在相同id.",
+		Description: "从活跃上下文中删除指定的一条message, 用于上下文精炼。serial与id取自该message内容开头的前缀行。" +
+			"一次调用删除一条; 同一轮内可以发起多条调用, 全部删除在本轮Tool返回完毕后一并生效。" +
+			"删除只作用于活跃上下文, 不改变history_context, 历史底账不受影响。",
 		Parameters: deleteActiveContextBySerialAndIDParameters,
 	}
 }

@@ -111,7 +111,10 @@ func (r *Runtime) RunTurn(ctx context.Context, input string) (string, error) {
 				return "", err
 			}
 
-			r.contextControl.AddSerial()
+			if err := r.contextControl.AddSerial(); err != nil {
+				return "", err
+			}
+
 			return message.Content, nil
 		}
 
