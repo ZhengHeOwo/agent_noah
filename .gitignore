@@ -5,8 +5,6 @@
 
 **/agent/local/data/*
 
-**/agent/local/prompts/*
-
 **/Collaborator_Workspace/*
 
 !**/Collaborator_Workspace/Synchronous_presentation_file.example

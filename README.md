@@ -35,7 +35,7 @@ Don't silently consume! if you're a big gay
 
 ## 附言：
 
-记忆功能完成后不再隐藏提示词, 现在未达预期
+提示词本身未达预期, 需随项目发展完善\
 
 个人练习项目，项目目标 - 协作者
 
@@ -47,4 +47,4 @@ Don't silently consume! if you're a big gay
 第一版确认完成之前不写完整的README
 
 -狰和\
-2026/10/14
+2026/10/15
