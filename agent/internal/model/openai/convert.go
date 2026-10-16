@@ -137,19 +137,13 @@ func toChatMessage(modelMessage model.Message) (chatMessage, error) {
 		role = "system"
 	case model.RoleUser:
 		role = "user"
-		if ok := strings.HasPrefix(strings.TrimSpace(modelMessage.Content), "Prefix:"); !ok {
-			modelMessage.Content = prefix + modelMessage.Content
-		}
+		modelMessage.Content = prefix + modelMessage.Content
 	case model.RoleAssistant:
 		role = "assistant"
-		if ok := strings.HasPrefix(strings.TrimSpace(modelMessage.Content), "Prefix:"); !ok {
-			modelMessage.Content = prefix + modelMessage.Content
-		}
+		modelMessage.Content = prefix + modelMessage.Content
 	case model.RoleTool:
 		role = "tool"
-		if ok := strings.HasPrefix(strings.TrimSpace(modelMessage.Content), "Prefix:"); !ok {
-			modelMessage.Content = prefix + modelMessage.Content
-		}
+		modelMessage.Content = prefix + modelMessage.Content
 	default:
 		return chatMessage{}, fmt.Errorf("Role类型不符合预设: %q", modelMessage.Role)
 	}

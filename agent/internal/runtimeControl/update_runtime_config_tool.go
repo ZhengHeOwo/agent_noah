@@ -31,7 +31,7 @@ var updateRuntimeConfigParameters = json.RawMessage(`{
     "status": {
       "type": "string",
       "enum": ["", "inactive"],
-      "description": "更改runtime_config的status字段: 空字符串表示本次不做任何更改; inactive表示将运行状态设为非活跃, 该变更在本轮RunTurn结束后生效, 之后程序会分离当前history_context用于事件分析, 并在下次进入active时启用全新的history_context表。恢复active由程序自动执行"
+      "description": "runtime_config 的 status 字段: 空字符串表示本次不做更改; inactive 表示把运行状态置为非活跃"
     }
   },
   "required": ["status"],
@@ -41,8 +41,9 @@ var updateRuntimeConfigParameters = json.RawMessage(`{
 func (u *UpdateRuntimeConfigTool) Definition() model.ToolDefinition {
 	return model.ToolDefinition{
 		Name: "update_runtime_config",
-		Description: "更新Runtime的运行配置。当前仅用于把运行状态置为inactive: 置为非活跃后, 本轮RunTurn结束时程序会分离当前history_context用于事件分析," +
-			"并在下次进入active时启用全新的history_context表。适合在一段工作收尾、需要整体换代上下文时使用。",
+		Description: "更新 Runtime 的运行配置, 当前只支持把 status 置为 inactive(空字符串表示不做更改)。\n" +
+			"置为非活跃后, 运行器下次以 inactive 加载上下文时只把最近 10 个 serial 的活跃上下文转入新的 profile, 其余活跃上下文与 history_context 一并丢弃。\n" +
+			"本工具只写 runtime_config 表: 运行状态在运行器启动时读取一次, 本次变更不会改变当前进程已加载的状态。",
 		Parameters: updateRuntimeConfigParameters,
 	}
 }

@@ -351,3 +351,5 @@ func (s *Sqlite) StatusTransition() error {
 
 	return nil
 }
+
+func (s *Sqlite) SqlDB() *sql.DB

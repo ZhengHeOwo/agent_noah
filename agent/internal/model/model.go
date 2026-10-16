@@ -27,7 +27,7 @@ type ToolCall struct {
 	// ID 必须原样写入对应工具结果消息的ToolCallID。
 	ID        string          `json:"id"`
 	Name      string          `json:"name"`
-	Arguments json.RawMessage `json:"argumnets"`
+	Arguments json.RawMessage `json:"arguments"`
 }
 
 // Prefix 消息的固定前缀.

@@ -35,7 +35,7 @@ var webSearchParameters = json.RawMessage(`{
   "properties": {
     "query": {
       "type": "string",
-      "description": "The search query, written like a search engine query. Must not be empty; maximum of 600 characters and 75 words."
+      "description": "搜索关键词, 按搜索引擎的用法书写, 不能为空, 上限 600 字符、75 词"
     }
   },
   "required": ["query"],
@@ -45,8 +45,8 @@ var webSearchParameters = json.RawMessage(`{
 func (t *Tool) Definition() model.ToolDefinition {
 	return model.ToolDefinition{
 		Name: "web_search",
-		Description: "通过 Brave 搜索接口搜索网页,返回最多 8 条结果,每条包含标题、链接、日期和摘要(摘要外可能再附几段额外摘录;日期和额外摘录不是每条都有)。用于查询需要当前事实或最新信息的问题;返回的是页面片段而不是全文,片段不够用时换更具体的关键词再搜。查询为空会直接报错;0 条结果与请求失败会在返回文本中区分。\n" +
-			"参数只有一个 query,按搜索引擎的用法给关键词,上限 600 字符、75 词;引擎会自动修正拼写,若实际使用的查询被修正,返回文本里会标出。",
+		Description: "通过 Brave 搜索接口查询网页, 返回最多 8 条结果, 每条含标题、链接, 以及可能存在的日期、摘要与额外摘录。返回的是页面片段而非全文, 适合需要当前事实或最新信息的问题; 片段不够时换更具体的关键词再搜。\n" +
+			"query 为空会直接报错; 0 条结果与请求失败在返回文本中可区分。引擎自动修正拼写时, 结果里会标出修正后的查询。",
 		Parameters: webSearchParameters,
 	}
 }
