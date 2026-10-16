@@ -25,13 +25,9 @@ mv ~/agent-bin/agent-noah.new ~/agent-bin/agent-noah &&\
 
 程序的brave(网络搜索)是外国的, 建议使用时挂着VPN, 等我把这个api的额度用完再接入国内搜索源
 
-## 重要须知:
-
 如果我的api_key意外泄露, 麻烦你联系 15166143379@163.com 或 he2619522@gmail.com\
-Should my API key be accidentally leaked, please contact 15166143379@163.com or he2619522@gmail.com
 
-请不要默默消耗! 除非你是一个巨大的同性恋\
-Don't silently consume! if you're a big gay
+Should my API key be accidentally leaked, please contact 15166143379@163.com or he2619522@gmail.com
 
 ## 附言：
 
@@ -40,11 +36,11 @@ Don't silently consume! if you're a big gay
 个人练习项目，项目目标 - 协作者
 
 近期做长任务需要的各组件,同时随便优化现有的东西\
--记忆加载写完了, 配置异常触发的切库恢复逻辑睡醒再写\
+-记忆加载写完了, 配置异常触发的切库恢复最近写\
 -当前history_context是直接扔,后续会用作事件分析(记忆模块)\
--建议退出走exit, 而不是直接ctrl+c, 可能没问题, 可能有问题, 不确定漏洞是否被修复, 太困了, 明天写代码时随便排查
+-前缀污染暂无立即改变方式,或许可以尝试在前缀加入随机数函数作为指纹在短期阻断该行为,但模型是模仿,不确定模仿内容改变是否影响模仿行为,暂不处理,等后续架构重制,引入'克劳德'的设计思路.
 
 第一版确认完成之前不写完整的README
 
--狰和\
-2026/10/15
+-ZhengHe\
+2026/10/17

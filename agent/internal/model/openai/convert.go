@@ -123,7 +123,7 @@ func toChatCompletionRequest(request model.Request) (chatCompletionRequest, erro
 }
 
 func toChatMessage(modelMessage model.Message) (chatMessage, error) {
-	prefix := fmt.Sprintf("Prefix: | serial %d | id %d | OccurrenceTime %s | MaxModelSteps %d | ResidueSteps %d |\n",
+	prefix := fmt.Sprintf("Prefix|serial%d|id%d|OccurrenceTime%s|MaxModelSteps%d|ResidueSteps%d|\n",
 		modelMessage.Prefix.Serial,
 		modelMessage.Prefix.Id,
 		modelMessage.Prefix.OccurrenceTime,

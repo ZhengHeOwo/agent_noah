@@ -30,7 +30,7 @@ type ToolCall struct {
 	Arguments json.RawMessage `json:"arguments"`
 }
 
-// Prefix 消息的固定前缀.
+// Prefix 当前信息的状态.
 type Prefix struct {
 	Serial         int64  `json:"serial"`
 	Id             int64  `json:"id"`
