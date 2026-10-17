@@ -37,6 +37,8 @@ Should my API key be accidentally leaked, please contact 15166143379@163.com or 
 
 前缀污染暂无立即解决办法,或许可以尝试在前缀加入随机数函数作为指纹在短期阻断该行为,但模型是模仿,不确定模仿内容改变是否影响模仿行为,暂不处理,等后续架构重制引入Claude的设计思路.
 
+10/17-19完成现有sqlite重构
+
 第一版确认完成之前不写完整的README
 
 -ZhengHe\

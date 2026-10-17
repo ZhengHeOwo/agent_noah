@@ -351,3 +351,9 @@ func (s *Sqlite) StatusTransition() error {
 
 	return nil
 }
+
+func (s *Sqlite) withTx(ctx context.Context, fn func(tx *sql.Tx)error) error {
+	tx, err := s.db
+}
+
+func 
