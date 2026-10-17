@@ -130,7 +130,7 @@ func run() error {
 	console.Write([]byte(fmt.Sprint("Agent Noah 已启动, 输入 exit 退出\n")))
 
 	for i := 1; ; i++ {
-		input, err := console.ReadLine(": ")
+		input, err := console.ReadLine(":")
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				return nil
@@ -153,6 +153,6 @@ func run() error {
 			continue
 		}
 
-		console.Write([]byte(fmt.Sprintf("\nNoah: \n%s\n", reply)))
+		console.Write([]byte(fmt.Sprintf("\nNoah:\n%s\n", reply)))
 	}
 }

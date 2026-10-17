@@ -11,13 +11,14 @@ const (
 	defaultModelName    = "deepseek-flash"
 	defaultEndpoint     = "https://api.deepseek.com/v1/chat/completions"
 	defaultTimeout      = "60s"
-	defaultSystemPrompt = "你是Bot,回复上限50中文汉字,合理安排句式,随时冷静处理问题,只回答专业行业问题,拒绝回复日常问题比如:讲故事..."
+	defaultSystemPrompt = "你是Bot,使用对方语言,回复上限50字符的内容,合理安排句式,冷静处理问题,只回答专业问题,拒绝回复日常问题"
 )
 
 type Config struct {
-	Model     ModelConfig
-	Agent     AgentConfig
-	WebSearch WebSearchConfig
+	Model        ModelConfig
+	Agent        AgentConfig
+	WebSearch    WebSearchConfig
+	DatabasePath DatabasePath
 }
 
 type ModelConfig struct {
@@ -33,6 +34,10 @@ type AgentConfig struct {
 
 type WebSearchConfig struct {
 	BraveAPIKey string
+}
+
+type DatabasePath struct {
+	SqlitePath string
 }
 
 func envOrDefault(key, defaultValue string) string {
@@ -77,6 +82,8 @@ func LoadConfig() (Config, error) {
 		return Config{}, fmt.Errorf("[环境变量] REQUEST_TIMEOUT 解析失败: %w", err)
 	}
 
+	sqlitePath := envOrDefault("SQLITEPATH", "./agent/local/data/sqlite.db")
+
 	config := Config{
 		Model: ModelConfig{
 			APIKey:   apiKey,
@@ -89,6 +96,9 @@ func LoadConfig() (Config, error) {
 		},
 		WebSearch: WebSearchConfig{
 			BraveAPIKey: braveAPIKey,
+		},
+		DatabasePath: DatabasePath{
+			SqlitePath: sqlitePath,
 		},
 	}
 
