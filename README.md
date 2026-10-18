@@ -6,24 +6,24 @@
 
 预计10/17-19 完成'数据库与运行器'重构
 
-## 主机编译与启动:
+## 编译与启动:
 
-在Linux端结束旧程序并编译和运行新程序, 复制这段到终端运行:
+-Linux-
+终端运行:
 
 cd ~/agent_noah &&\
 go build -o ~/agent-bin/agent-noah.new ./agent/cmd &&\
 mv ~/agent-bin/agent-noah.new ~/agent-bin/agent-noah &&\
 ~/agent-bin/agent-noah
 
-比手写方便
+-Windows-
+终端运行:
+
+go run ./agent/cmd
 
 ## 运行前准备：
 
 在'.env.example'相同位置, 按该文件提示创建'.env.local'文件
-
-## 运行：
-
-终端输入: go run ./agent/cmd
 
 ## 须知:
 
